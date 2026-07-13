@@ -1,0 +1,67 @@
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+// =============================================================================
+// PrivateCounter — a privacy-preserving counter on Midnight
+// -----------------------------------------------------------------------------
+// This contract demonstrates Midnight's "private by default" model: it keeps a
+// public tally while proving that each increment was authorised by the holder
+// of a secret key — WITHOUT ever revealing that key or the caller's identity.
+//
+// PUBLIC  (stored on-chain, visible to anyone via the indexer / explorer):
+//   - count      : the total number of times the counter has been incremented.
+//   - lastActor  : a 32-byte cryptographic COMMITMENT (hash) to the identity of
+//                  the account that last incremented the counter. Because it is
+//                  a one-way hash, it proves "an authorised holder of a secret
+//                  did this" WITHOUT revealing which secret, or who.
+//
+// PRIVATE (never leaves the user's machine, never on-chain, never in the proof):
+//   - localSecretKey() : the caller's 32-byte secret key, supplied by the
+//                        witness (the TypeScript host) at circuit-execution
+//                        time. It is the private circuit input.
+//   - amount           : circuit arguments are private by default; the caller's
+//                        chosen increment amount starts out private.
+//
+// WHAT THE USER PROVES WITHOUT REVEALING:
+//   - That they know a secret key whose commitment is the one recorded on-chain
+//     — i.e. that they participated — while staying anonymous. The secret key is
+//     only ever disclosed in hashed (committed) form, never in the clear.
+// =============================================================================
+
+// ── Public ledger state ─────────────────────────────────────────────────────
+export ledger count: Counter;
+export ledger lastActor: Bytes<32>;
+
+// ── Private witness (the private circuit input) ─────────────────────────────
+// The host provides the caller's secret key at runtime. Prefixing derived
+// private values with `_` is a Compact best practice for tracking secrecy.
+witness localSecretKey(): Bytes<32>;
+
+// Derives a public, deterministic commitment from a secret key. Hashing with a
+// domain separator means the stored value cannot be reversed to recover the
+// secret, nor collide with hashes used for other purposes.
+export circuit actorCommitment(sk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "private-counter:actor:"), sk]);
+}
+
+// Increment the public counter by `amount`, recording an anonymous commitment
+// to the caller. Both `amount` and the secret key are private by default and
+// must be explicitly disclosed before they can affect public state.
+export circuit increment(amount: Uint<16>): [] {
+  const _sk = localSecretKey();
+
+  // Deliberate disclosure #1: publish only the HASH of the secret, never `_sk`.
+  // disclose() tells the compiler this hashed value is safe to make public.
+  lastActor = disclose(actorCommitment(_sk));
+
+  // Deliberate disclosure #2: the increment amount is chosen to be public so it
+  // can update on-chain state. Without disclose() this line is a compile error.
+  count += disclose(amount);
+}
+
+// Read the current public count. Unrestricted — anyone may call it, and no
+// disclosure is needed because `count` is already public ledger state.
+export circuit get(): Uint<64> {
+  return count;
+}
