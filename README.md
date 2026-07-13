@@ -193,9 +193,6 @@ sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 
 ## Screenshots
 
-> Drop your images into the `screenshots/` folder using these exact filenames and
-> they'll render automatically. (Until then, the images below show as broken.)
-
 ### 1. `compact compile` output
 Run `npm run compile` and screenshot the terminal output, then save it as
 `screenshots/compile-output.png`.
