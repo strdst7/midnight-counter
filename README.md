@@ -7,7 +7,7 @@
 | Network  | Address                                                            |
 |----------|--------------------------------------------------------------------|
 | Preview  | `87b1372fbae16fc4ec5ac3387c904f5b0d8969178dd70c7c8ff003adef373934` |
-| Preprod  | _not deployed_                                                     |
+| Preprod  | aa26324b48117dec15fd40d46b341476b61d5e09268243c834cce2cc31e5ec2b                                                  |
 
 Deployed on 2026-07-13 to the Midnight **Preview** testnet.
 Deployer address: `mn_addr_preview170v075ylfmgraertdzzzu3c3wendmx5gra87j2fw3rh5xcw2plrs7h7xyf`
