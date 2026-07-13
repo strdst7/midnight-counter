@@ -153,6 +153,25 @@ sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 
 ## Screenshots
 
-<!-- LEAVE PLACEHOLDER — add screenshots of the `compact compile` output and the
-     deployed contract address here. -->
-_TODO: add screenshots of the compile output and the deployed contract address._
+> Drop your images into the `screenshots/` folder using these exact filenames and
+> they'll render automatically. (Until then, the images below show as broken.)
+
+### 1. `compact compile` output
+Run `npm run compile` and screenshot the terminal output, then save it as
+`screenshots/compile-output.png`.
+
+![compact compile output](screenshots/compile-output.png)
+
+### 2. Deployed contract address
+Screenshot the deploy log line `Contract Address: …` (from
+`npm run deploy -- --network preview`) — or the contract on a
+[Preview explorer](https://docs.midnight.network/relnotes/network) — and save it
+as `screenshots/contract-address.png`.
+
+![deployed contract address](screenshots/contract-address.png)
+
+### 3. Tests passing (optional)
+Run `npm test` and screenshot the green result, saved as
+`screenshots/tests-passing.png`.
+
+![tests passing](screenshots/tests-passing.png)
