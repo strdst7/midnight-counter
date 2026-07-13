@@ -194,15 +194,13 @@ sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 ## Screenshots
 
 ### 1. `compact compile` output
-Run `npm run compile` and screenshot the terminal output, then save it as
-`screenshots/compile-output.png`.
+
 
 <img width="2240" height="1260" alt="screenshots:compile-output png" src="https://github.com/user-attachments/assets/fe2ee383-39f7-47fc-baba-b29de1f16312" />
 
 
 ### 2. Deployed contract address
-Screenshot the deploy log line `Contract Address: …` (from
-`npm run deploy -- --network preview`) — or the contract on a
+
 [Preview explorer](https://docs.midnight.network/relnotes/network) — 
 
 
@@ -210,22 +208,12 @@ Screenshot the deploy log line `Contract Address: …` (from
 <img width="2240" height="1260" alt="screenshots:contract-address" src="https://github.com/user-attachments/assets/3a736918-3bd0-445f-91f2-7e64db05c1f6" />
 
 
-### 3. Tests passing (optional)
-Run `npm test` and screenshot the green result, saved as
-`screenshots/tests-passing.png`.
+### 3. Tests passing
 
 
 
 <img width="2240" height="1260" alt="screenshots:tests-passing" src="https://github.com/user-attachments/assets/a8752467-7641-43ce-bc44-91782df08541" />
 
-
-# Initial Idea
-
-The goal of this project was to explore Midnight's privacy-first architecture through the smallest useful smart contract possible.
-
-Instead of building a conventional counter, the project demonstrates authenticated state updates using zero-knowledge proofs, where authorization is verified without exposing user identity or secret keys.
-
-By combining Compact circuits with the Midnight JavaScript SDK, this repository serves as a practical reference for developers learning private smart contract development.
 
 ---
 
