@@ -1,6 +1,13 @@
+
 # PrivateCounter
 
-> A privacy-preserving counter on the Midnight Network: anyone can see the tally, but each increment is authorized by a secret key that is never revealed on-chain.
+> A minimal, production-quality privacy-preserving smart contract for the Midnight Network demonstrating how zero-knowledge proofs enable authenticated state changes without revealing user identity.
+
+![Midnight](https://img.shields.io/badge/Midnight-Compact-blueviolet)
+![Compact](https://img.shields.io/badge/Compact-v0.31+-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)
+![Node](https://img.shields.io/badge/Node.js-22.x-339933)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Contract Address
 
@@ -31,6 +38,39 @@ It is a deliberately small contract whose purpose is to demonstrate Midnight's
 "private by default" model end-to-end: writing private witnesses, deliberately
 disclosing only what is safe, compiling to zero-knowledge circuits, testing the
 logic off-chain, and deploying to a public testnet.
+
+# Features
+
+- 🔒 Zero-knowledge authorization
+- 👤 Anonymous participants
+- 📈 Public verifiable state
+- ⚡ Compact smart contract
+- 🧪 Comprehensive unit tests
+- 🐳 Docker proof server
+- 💻 TypeScript deployment tooling
+- 🌐 Ready for Preview & Preprod testnets
+
+
+# Architecture
+
+```
+                 Secret Key
+                      │
+                      ▼
+             Private Witness Input
+                      │
+                      ▼
+        ┌──────────────────────────┐
+        │   Compact Smart Contract │
+        └──────────────────────────┘
+             │               │
+             │               │
+             ▼               ▼
+      Public Counter   Hash Commitment
+             │               │
+             └────── On Chain ──────►
+```
+
 
 ## Privacy Model
 
@@ -160,18 +200,53 @@ sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 Run `npm run compile` and screenshot the terminal output, then save it as
 `screenshots/compile-output.png`.
 
-![compact compile output](screenshots/compile-output.png)
+<img width="2240" height="1260" alt="screenshots:compile-output png" src="https://github.com/user-attachments/assets/fe2ee383-39f7-47fc-baba-b29de1f16312" />
+
 
 ### 2. Deployed contract address
 Screenshot the deploy log line `Contract Address: …` (from
 `npm run deploy -- --network preview`) — or the contract on a
-[Preview explorer](https://docs.midnight.network/relnotes/network) — and save it
-as `screenshots/contract-address.png`.
+[Preview explorer](https://docs.midnight.network/relnotes/network) — 
 
-![deployed contract address](screenshots/contract-address.png)
+
+
+<img width="2240" height="1260" alt="screenshots:contract-address" src="https://github.com/user-attachments/assets/3a736918-3bd0-445f-91f2-7e64db05c1f6" />
+
 
 ### 3. Tests passing (optional)
 Run `npm test` and screenshot the green result, saved as
 `screenshots/tests-passing.png`.
 
-![tests passing](screenshots/tests-passing.png)
+
+
+<img width="2240" height="1260" alt="screenshots:tests-passing" src="https://github.com/user-attachments/assets/a8752467-7641-43ce-bc44-91782df08541" />
+
+
+# Initial Idea
+
+The goal of this project was to explore Midnight's privacy-first architecture through the smallest useful smart contract possible.
+
+Instead of building a conventional counter, the project demonstrates authenticated state updates using zero-knowledge proofs, where authorization is verified without exposing user identity or secret keys.
+
+By combining Compact circuits with the Midnight JavaScript SDK, this repository serves as a practical reference for developers learning private smart contract development.
+
+---
+
+# References
+
+- Midnight Network
+- Compact Language
+- Midnight JavaScript SDK
+
+---
+
+# License
+
+MIT License
+
+---
+
+Built with ❤️ using **Midnight** and **Compact**.
+
+![Builder](https://img.shields.io/badge/Miii-2026-orange)
+
