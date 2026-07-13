@@ -201,7 +201,7 @@ sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 
 ### 2. Deployed contract address
 
-[Preview explorer](https://docs.midnight.network/relnotes/network) — 
+[Preview explorer](https://docs.midnight.network/relnotes/network) 
 
 
 
