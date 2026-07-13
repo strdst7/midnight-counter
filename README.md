@@ -117,8 +117,39 @@ and verifies that the private secret key is never exposed in public state.
 
 ## Initial Idea
 
-<!-- LEAVE PLACEHOLDER — fill this in manually with your original idea / motivation. -->
-_TODO: describe your initial idea here._
+I wanted my first Midnight contract to teach me the one thing that makes the
+platform different from every other chain I'd used: **selective disclosure**. On
+a normal blockchain, "who did this and how much" is public by default. On
+Midnight it's private by default, and you have to *deliberately* choose what
+leaks. I wanted to feel that difference in code, not just read about it.
+
+A counter is the "hello world" of smart contracts, so I started there — but a
+plain public counter teaches you nothing about privacy. So I asked: **what is the
+smallest possible contract that still has a real secret?** The answer I landed on
+was a counter where the *tally* is public, but *who is allowed to bump it* is
+proven privately.
+
+That gave me the design:
+
+- Keep the running `count` public — anyone should be able to read the total.
+- Require every increment to be authorized by a **secret key** that never leaves
+  the caller's machine (a `witness`).
+- Record only a one-way **hash commitment** of that key on-chain (`lastActor`),
+  so the contract can prove "an authorized party did this" without ever revealing
+  *which* party — the classic zero-knowledge "prove without revealing" move.
+- Use `disclose()` in exactly two deliberate places, so the compiler forces me to
+  acknowledge every single thing that becomes public.
+
+The point wasn't the counter itself — it was building the full muscle memory of a
+Midnight dApp end to end: write Compact, compile to zero-knowledge circuits, unit
+test the circuits off-chain (including a test that *fails* if the secret ever
+leaks), run a proof server, fund a wallet from the faucet, and deploy to a public
+testnet.
+
+**Where this could go next:** the same "public tally + private authorization"
+pattern is the seed for genuinely useful things — anonymous upvoting/petitions
+(one vote per secret, no identity revealed), private membership counters, or
+sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 
 ## Screenshots
 
