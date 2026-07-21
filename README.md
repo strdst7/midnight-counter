@@ -15,6 +15,11 @@ The files needed for both mandatory checks are tracked at the repository root so
 they are included in the judged submission and can be inspected without running
 the project.
 
+If the submission platform uses a separate judged-files picker, follow
+[`SUBMISSION_FILES.md`](SUBMISSION_FILES.md) and run `npm run submission:verify`
+before submitting. The repository cannot automatically control which files an
+external form includes in its judged subset.
+
 ### Step 1 — Compact circuit and ledger declarations
 
 - [`counter.compact`](counter.compact) is the Compact source file.
