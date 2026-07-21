@@ -79,7 +79,7 @@ logic off-chain, and deploying to a public testnet.
 
 # Features
 
-- 🔒 Zero-knowledge authorization
+- 🔒 Zero-knowledge witness privacy
 - 👤 Anonymous participants
 - 📈 Public verifiable state
 - ⚡ Compact smart contract
@@ -204,8 +204,8 @@ leaks. I wanted to feel that difference in code, not just read about it.
 A counter is the "hello world" of smart contracts, so I started there — but a
 plain public counter teaches you nothing about privacy. So I asked: **what is the
 smallest possible contract that still has a real secret?** The answer I landed on
-was a counter where the *tally* is public, but *who is allowed to bump it* is
-proven privately.
+was a counter where the *tally* is public, but the private value behind the
+caller's commitment remains hidden.
 
 That gave me the design:
 
@@ -226,8 +226,8 @@ test the circuits off-chain (including a test that *fails* if the secret ever
 leaks), run a proof server, fund a wallet from the faucet, and deploy to a public
 testnet.
 
-**Where this could go next:** the same "public tally + private authorization"
-pattern is the seed for genuinely useful things — anonymous upvoting/petitions
+**Where this could go next:** this "public tally + private commitment" pattern
+could be extended with real authorization to support anonymous upvoting/petitions
 (one vote per secret, no identity revealed), private membership counters, or
 sealed-bid tallies. PrivateCounter is the minimal kernel of all of those.
 
