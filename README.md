@@ -1,13 +1,45 @@
 
 # PrivateCounter
 
-> A minimal, production-quality privacy-preserving smart contract for the Midnight Network demonstrating how zero-knowledge proofs enable authenticated state changes without revealing user identity.
+> A privacy-preserving counter on the Midnight Network: anyone can see the tally, while the private witness behind each caller commitment is never revealed on-chain.
 
 ![Midnight](https://img.shields.io/badge/Midnight-Compact-blueviolet)
 ![Compact](https://img.shields.io/badge/Compact-v0.31+-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)
 ![Node](https://img.shields.io/badge/Node.js-22.x-339933)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+## Judge Verification (Mandatory Steps 1 and 2)
+
+The files needed for both mandatory checks are tracked at the repository root so
+they are included in the judged submission and can be inspected without running
+the project.
+
+### Step 1 — Compact circuit and ledger declarations
+
+- [`counter.compact`](counter.compact) is the Compact source file.
+- `export ledger count: Counter;` declares the public tally.
+- `export ledger lastActor: Bytes<32>;` declares the public caller commitment.
+- `export circuit increment(...)` and `export circuit get()` are circuit
+  definitions.
+
+### Step 2 — private witness, public state, and deliberate disclosure
+
+| Classification | Exact declaration/use | Why |
+|---|---|---|
+| Private witness | `witness localSecretKey(): Bytes<32>;` | Supplied from local private state and never written to the ledger. |
+| Public state | `export ledger count: Counter;` | Public on-chain counter. |
+| Public state | `export ledger lastActor: Bytes<32>;` | Public hash commitment, not the raw witness. |
+| Deliberate disclosure | `disclose(actorCommitment(_sk))` | Only the one-way commitment derived from the witness becomes public. |
+| Deliberate disclosure | `disclose(amount)` | The amount is intentionally made public before updating the public counter. |
+
+The raw `_sk` value is never passed to `disclose()` and is never assigned to a
+ledger field. Test 4 in [`tests/counter.test.ts`](tests/counter.test.ts) also
+checks that the raw witness bytes do not appear in serialized public state.
+
+> Scope: this contract demonstrates private/public separation and selective
+> disclosure. It does not implement membership or owner-only access control;
+> any caller may increment the counter.
 
 ## Contract Address
 
@@ -30,8 +62,9 @@ count together with an *anonymous commitment* to whoever last changed it.
 
 - Anyone can call `increment(amount)` to add to the public count.
 - Each call records a one-way cryptographic commitment (`lastActor`) derived from
-  the caller's **secret key**. This proves an authorized party performed the
-  increment, **without revealing who** or leaking the key.
+  the caller's **secret key**. The circuit proves that this public commitment was
+  derived consistently from the private witness, **without revealing who** or
+  leaking the key.
 - Anyone can call `get()` to read the current count.
 
 It is a deliberately small contract whose purpose is to demonstrate Midnight's
@@ -86,9 +119,9 @@ logic off-chain, and deploying to a public testnet.
     (the TypeScript host) at runtime. It is the private circuit input.
 
 - **What the user PROVES without revealing:**
-  - That they know a secret key whose commitment equals the value recorded on
-    chain — i.e. that they legitimately participated — while remaining anonymous.
-    The secret is only ever disclosed in *hashed* (committed) form via
+  - That the recorded commitment was correctly derived from the private witness
+    used by the circuit, while the witness itself remains hidden. The secret is
+    only ever disclosed in *hashed* (committed) form via
     `disclose(actorCommitment(_sk))`, never in the clear.
 
 ## Tech Stack
@@ -172,11 +205,13 @@ proven privately.
 That gave me the design:
 
 - Keep the running `count` public — anyone should be able to read the total.
-- Require every increment to be authorized by a **secret key** that never leaves
-  the caller's machine (a `witness`).
+- Bind every increment to a **secret key** that never leaves the caller's
+  machine (a `witness`). This is a privacy demonstration, not an access-control
+  check; any caller may supply a witness and increment.
 - Record only a one-way **hash commitment** of that key on-chain (`lastActor`),
-  so the contract can prove "an authorized party did this" without ever revealing
-  *which* party — the classic zero-knowledge "prove without revealing" move.
+  so the contract can prove that the commitment matches the private witness
+  without revealing the witness — the classic zero-knowledge "prove without
+  revealing" move.
 - Use `disclose()` in exactly two deliberate places, so the compiler forces me to
   acknowledge every single thing that becomes public.
 
@@ -234,4 +269,3 @@ MIT License
 Built with ❤️ using **Midnight** and **Compact**.
 
 ![Builder](https://img.shields.io/badge/Miii-2026-orange)
-

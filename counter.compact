@@ -6,15 +6,15 @@ import CompactStandardLibrary;
 // PrivateCounter — a privacy-preserving counter on Midnight
 // -----------------------------------------------------------------------------
 // This contract demonstrates Midnight's "private by default" model: it keeps a
-// public tally while proving that each increment was authorised by the holder
-// of a secret key — WITHOUT ever revealing that key or the caller's identity.
+// public tally while proving that the caller knows a private value used to form
+// an anonymous commitment — WITHOUT revealing that value or their identity.
 //
 // PUBLIC  (stored on-chain, visible to anyone via the indexer / explorer):
 //   - count      : the total number of times the counter has been incremented.
 //   - lastActor  : a 32-byte cryptographic COMMITMENT (hash) to the identity of
 //                  the account that last incremented the counter. Because it is
-//                  a one-way hash, it proves "an authorised holder of a secret
-//                  did this" WITHOUT revealing which secret, or who.
+//                  a one-way hash, it binds the state update to the private
+//                  witness WITHOUT revealing the witness or the caller.
 //
 // PRIVATE (never leaves the user's machine, never on-chain, never in the proof):
 //   - localSecretKey() : the caller's 32-byte secret key, supplied by the
@@ -24,9 +24,9 @@ import CompactStandardLibrary;
 //                        chosen increment amount starts out private.
 //
 // WHAT THE USER PROVES WITHOUT REVEALING:
-//   - That they know a secret key whose commitment is the one recorded on-chain
-//     — i.e. that they participated — while staying anonymous. The secret key is
-//     only ever disclosed in hashed (committed) form, never in the clear.
+//   - That the recorded commitment was correctly derived from the private
+//     witness used in the circuit. This demonstrates privacy, not access
+//     control: any caller may increment. The secret is never revealed in clear.
 // =============================================================================
 
 // ── Public ledger state ─────────────────────────────────────────────────────
