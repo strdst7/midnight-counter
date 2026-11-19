@@ -33,9 +33,11 @@ const SEED = getOrCreateSeed(network);
 
 // ─── Proof server readiness ────────────────────────────────────────────────────
 //
-// The proof-server image is distroless and has no shell, so it can't run a
-// container-side healthcheck. Poll it from the host before we submit anything
-// that needs proofs.
+// The proof-server image has no HTTP client (no curl/wget/nc) and its PATH
+// exposes only the ledger nix store, so a container-side HTTP check cannot rely
+// on the usual tools. docker-compose.yml carries a /dev/tcp healthcheck (a bash
+// builtin, so it needs neither), and this host-side poll remains as a fallback
+// for runs that don't go through compose.
 
 async function waitForProofServer(maxAttempts = 60, delayMs = 2000): Promise<boolean> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
