@@ -51,16 +51,18 @@ services:
         condition: service_healthy
 
   proof-server:
-    # No healthcheck: the proof-server image is distroless (nix-built) and has
-    # no shell or curl/wget binaries inside, so `docker compose --wait` cannot
-    # gate on it. The deploy script polls the proof-server from the host side
-    # before submitting transactions (see waitForProofServer in src/deploy.ts).
-    # Pinned to 8.0.3, NOT a 7.x: proof-server 7.x (all patches tested: 7.0.0
-    # through 7.0.3) hangs in proof generation on Apple Silicon Macs running
-    # Docker Desktop — the actix worker thread spins at 100% CPU forever after
-    # receiving /prove, with no log output, no memory growth, and no progress.
-    # The same image runs fine on x86_64 Linux. 8.0.3 fixed this; never bump
-    # downward into the 7.x line without re-validating on macOS arm64.
+    # NOT distroless. Earlier comments here claimed it was, because `ls` fails
+    # inside: /bin actually holds bash, sh and coreutils, but PATH contains only
+    # the ledger nix store, so every command looks missing. What is genuinely
+    # absent is an HTTP client (no curl/wget/nc) — and the entrypoint is
+    # `bash -c`, which is all a /dev/tcp healthcheck needs.
+    # Pinned to 8.0.3, NOT a 7.x: proof-server 7.x (7.0.0 through 7.0.3 tested)
+    # hangs after receiving /prove on Apple Silicon + Docker Desktop — the
+    # worker thread spins at 100% CPU with no log output and no progress, while
+    # the same digest works on x86_64 Linux. Upstream traced the 6.x/7.x arm64
+    # images to cross-compilation and moved to native arm64 builds from
+    # 8.0.0-rc.4: https://github.com/midnightntwrk/midnight-ledger/issues/135
+    # Never bump downward into the 7.x line without re-testing on macOS arm64.
     image: midnightntwrk/proof-server:8.0.3
     container_name: midnight-counter-proof-server
     command: ["midnight-proof-server -v"]
@@ -68,3 +70,14 @@ services:
       - "6300:6300"
     environment:
       RUST_BACKTRACE: "full"
+
+    healthcheck:
+      # /dev/tcp is a bash builtin: no binary, no PATH entry, no packages. It
+      # exits 0 only when the socket actually connects. Without this block
+      # `docker compose up -d --wait` returns in ~2s, long before the server
+      # accepts connections, and any deploy that trusts --wait races it.
+      test: ["CMD", "/bin/bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/6300"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
